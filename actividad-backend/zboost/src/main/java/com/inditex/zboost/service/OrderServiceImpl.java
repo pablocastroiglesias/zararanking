@@ -28,9 +28,10 @@ public class OrderServiceImpl implements OrderService {
          */
 
         Map<String, Object> params = new HashMap<>();
-        params.put("limit", limit);
 
-        String sql = "";
+
+        String sql = "SELECT * FROM orders ORDER BY date DESC LIMIT (:limit)";
+        params.put("limit",limit);
 
         return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(Order.class));
     }
@@ -62,10 +63,12 @@ public class OrderServiceImpl implements OrderService {
         // Escribe la query para recuperar la entidad OrderDetail por ID
         Map<String, Object> params = new HashMap<>();
         params.put("orderId", orderId);
+        String order="Select * from order_items where order_id=(:orderId)";
         OrderDetail orderDetail = null;
 
+
         // Una vez has conseguido recuperar los detalles del pedido, faltaria recuperar los productos que forman parte de el...
-        String productOrdersSql = "";
+        String productOrdersSql ="Select p.name,p.price,p.category,p.image_url from products p join order_items o on p.id=o.product_id where o.order_id=(:orderId)";
         List<ProductOrderItem> products = jdbcTemplate.query(productOrdersSql, params, new BeanPropertyRowMapper<>(ProductOrderItem.class));
 
         orderDetail.setProducts(products);
